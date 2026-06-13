@@ -3,69 +3,158 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>World Cup 2026 Office Draw</title>
-  <meta name="description" content="A simple World Cup 2026 office draw / sweepstake site for GitHub Pages." />
+  <title>World Cup 2026 Office Draw & Tracker</title>
+  <meta name="description" content="World Cup 2026 office draw, fixtures, standings and sweepstake leaderboard for GitHub Pages." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header class="hero">
-    <div class="wrap">
-      <p class="eyebrow">Office Sweepstake</p>
-      <h1>World Cup 2026 Office Draw</h1>
-      <p class="lead">Add names, run a fair random draw, export the results, print them, or share a read-only link.</p>
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">GitHub Pages Office Pool</p>
+        <h1>World Cup 2026 Office Draw & Tracker</h1>
+        <p class="lead">Run a fair office sweepstake, enter match scores, calculate group standings and keep a live office leaderboard — all in a simple static website.</p>
+      </div>
+      <div class="hero-card">
+        <span class="hero-number">48</span><span>Teams</span>
+        <span class="hero-number">12</span><span>Groups</span>
+        <span class="hero-number">72</span><span>Group fixtures</span>
+      </div>
     </div>
   </header>
 
+  <nav class="tabs wrap" aria-label="Main sections">
+    <button class="tab active" data-tab="draw">Office Draw</button>
+    <button class="tab" data-tab="fixtures">Fixtures & Scores</button>
+    <button class="tab" data-tab="standings">Standings</button>
+    <button class="tab" data-tab="leaderboard">Office Leaderboard</button>
+    <button class="tab" data-tab="admin">Data / Admin</button>
+  </nav>
+
   <main class="wrap">
-    <section class="card" id="draw-panel">
-      <h2>1. Add participants</h2>
-      <p>Paste one name per line, or separate names with commas.</p>
+    <section id="draw" class="panel active">
+      <div class="grid two">
+        <article class="card">
+          <h2>1. Create the office draw</h2>
+          <p class="muted">Paste staff names, then randomly assign each person a World Cup team.</p>
 
-      <label for="officeName">Office / Company name</label>
-      <input id="officeName" type="text" placeholder="e.g. SMS Guys World Cup Draw" />
+          <label for="officeName">Office / Company name</label>
+          <input id="officeName" type="text" placeholder="e.g. AssetExistence World Cup Draw" />
 
-      <label for="participants">Participants</label>
-      <textarea id="participants" rows="10" placeholder="Derek&#10;Sharon&#10;Brett&#10;Paul"></textarea>
+          <label for="participants">Participants</label>
+          <textarea id="participants" rows="12" placeholder="Derek&#10;Sharon&#10;Brett&#10;Paul"></textarea>
 
-      <div class="options">
-        <label class="check">
-          <input id="allowDuplicates" type="checkbox" />
-          Allow teams to repeat if there are more than 48 participants
-        </label>
+          <label class="inline-check">
+            <input type="checkbox" id="allowRepeats" />
+            Allow team repeats if there are more than 48 participants
+          </label>
+
+          <div class="actions">
+            <button class="primary" id="runDrawBtn">Run Random Draw</button>
+            <button id="downloadDrawCsvBtn" disabled>Download Draw CSV</button>
+            <button id="printBtn">Print</button>
+          </div>
+
+          <p class="note">The draw uses the browser’s cryptographic random generator. Run it once in front of the office, then export or print the result.</p>
+        </article>
+
+        <article class="card">
+          <h2>Current draw</h2>
+          <div id="drawSummary" class="summary-box">No draw has been run yet.</div>
+          <div id="drawTable"></div>
+        </article>
       </div>
-
-      <div class="actions">
-        <button id="runDrawBtn" class="primary">Run Random Draw</button>
-        <button id="clearBtn" type="button">Clear</button>
-      </div>
-      <p class="note">Tip: for a formal office draw, run it once in front of everyone, then export/print the result.</p>
     </section>
 
-    <section class="card">
-      <h2>2. Results</h2>
-      <div id="status" class="status">No draw has been run yet.</div>
-      <div class="actions">
-        <button id="copyLinkBtn" type="button" disabled>Copy Share Link</button>
-        <button id="downloadCsvBtn" type="button" disabled>Download CSV</button>
-        <button id="downloadJsonBtn" type="button" disabled>Download JSON</button>
-        <button id="printBtn" type="button" disabled>Print</button>
-      </div>
-      <div id="results" class="results"></div>
+    <section id="fixtures" class="panel">
+      <article class="card">
+        <div class="section-head">
+          <div>
+            <h2>Fixtures & score entry</h2>
+            <p class="muted">Enter match scores here. Standings and the office leaderboard update automatically.</p>
+          </div>
+          <div class="filters">
+            <label for="groupFilter">Group</label>
+            <select id="groupFilter"></select>
+            <label for="teamFilter">Team</label>
+            <select id="teamFilter"></select>
+          </div>
+        </div>
+        <div id="fixturesList" class="fixture-list"></div>
+      </article>
     </section>
 
-    <section class="card small">
-      <h2>How it works</h2>
-      <p>This site runs entirely in the browser. It does not collect or store data on a server. Results are stored only in this browser unless you export them or copy a share link.</p>
-      <p>The random draw uses the browser's built-in cryptographic random number generator.</p>
+    <section id="standings" class="panel">
+      <article class="card">
+        <div class="section-head">
+          <div>
+            <h2>Group standings</h2>
+            <p class="muted">Simplified ranking: points, goal difference, goals for, then team name. Official tournament tie-breakers may include additional rules.</p>
+          </div>
+          <button id="downloadStandingsCsvBtn">Download Standings CSV</button>
+        </div>
+        <div id="standingsGrid" class="standings-grid"></div>
+      </article>
+
+      <article class="card spacer">
+        <h2>Third-place tracker</h2>
+        <p class="muted">This helps track the best third-placed teams.</p>
+        <div id="thirdPlaceTable"></div>
+      </article>
+    </section>
+
+    <section id="leaderboard" class="panel">
+      <article class="card">
+        <div class="section-head">
+          <div>
+            <h2>Office leaderboard</h2>
+            <p class="muted">Participants are ranked by their assigned team’s current group performance.</p>
+          </div>
+          <button id="downloadLeaderboardCsvBtn" disabled>Download Leaderboard CSV</button>
+        </div>
+        <div id="leaderboardTable"></div>
+      </article>
+    </section>
+
+    <section id="admin" class="panel">
+      <div class="grid two">
+        <article class="card">
+          <h2>Data controls</h2>
+          <p class="muted">This site stores data only in this browser unless you export it or copy a share link.</p>
+
+          <div class="actions vertical">
+            <button id="copyShareLinkBtn">Copy Share Link</button>
+            <button id="exportJsonBtn">Export Full JSON Backup</button>
+            <label class="upload-button">Import JSON Backup
+              <input id="importJsonInput" type="file" accept="application/json" />
+            </label>
+            <button class="danger" id="resetScoresBtn">Reset Scores Only</button>
+            <button class="danger" id="resetAllBtn">Reset Everything</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2>Site status</h2>
+          <div id="adminStatus" class="summary-box"></div>
+          <h3>Files to upload to GitHub root</h3>
+          <pre class="file-list">index.html
+style.css
+data.js
+app.js
+.nojekyll</pre>
+          <p class="note">Upload these files to the root of your repository. Your old ZIP file in the repo can be deleted.</p>
+        </article>
+      </div>
     </section>
   </main>
 
   <footer class="footer">
     <div class="wrap">
-      <p>Built for GitHub Pages • Static HTML/CSS/JavaScript</p>
+      <p>Static GitHub Pages site • No server database • Browser storage + JSON export</p>
     </div>
   </footer>
 
+  <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
